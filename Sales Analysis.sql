@@ -1,5 +1,5 @@
 
----product
+--- creating the product view 
 
 create view dim_product as
 select 
@@ -21,10 +21,7 @@ left join Production.ProductSubcategory ps on p.ProductSubcategoryID = ps.Produc
 left join Production.ProductCategory pc on ps.ProductCategoryID = pc.ProductCategoryID
 
 
----costing ---> date twe ka		null pr lr yin getdate() nae a sar htoe yan....
-
-
-----product cost history
+----product cost history,in this case there found an error at the EndDate column value with the null. So I wrote CTE to replace the null value with the current date.
 
 create view fct_productcosthistory as
 
@@ -114,6 +111,18 @@ left join Person.CountryRegion cr on sp.CountryRegionCode = cr.CountryRegionCode
 left join Person.AddressType at on bea.AddressTypeID = at.AddressTypeID
 left join Sales.SalesTerritory st on sp.TerritoryID = st.TerritoryID
 
+---Employee Table
+create view dim_salesperson as
+select 
+emp.BusinessEntityID,CONCAT(p.FirstName,' ',p.MiddleName,' ',p.LastName) as 'Employee Name',
+emp.JobTitle,emp.BirthDate,emp.MaritalStatus,emp.Gender,emp.HireDate,
+p.PersonType, 
+
+ea.EmailAddress
+from HumanResources.Employee emp 
+left join Person.Person p on emp.BusinessEntityID = p.BusinessEntityID
+left join Person.EmailAddress ea on p.BusinessEntityID = ea.BusinessEntityID
+where p.PersonType = 'SP'
 
 ----Sales Table
 
@@ -140,15 +149,4 @@ Left Join Sales.SalesOrderHeader SH on SD.SalesOrderID = SH.SalesOrderID
 left join fct_productcosthistory pc on sd.ProductID = pc.ProductID and sh.OrderDate >= PC.StartDate and sh.OrderDate <=EndDate
 
 
----Employee Table
-create view dim_salesperson as
-select 
-emp.BusinessEntityID,CONCAT(p.FirstName,' ',p.MiddleName,' ',p.LastName) as 'Employee Name',
-emp.JobTitle,emp.BirthDate,emp.MaritalStatus,emp.Gender,emp.HireDate,
-p.PersonType, 
 
-ea.EmailAddress
-from HumanResources.Employee emp 
-left join Person.Person p on emp.BusinessEntityID = p.BusinessEntityID
-left join Person.EmailAddress ea on p.BusinessEntityID = ea.BusinessEntityID
-where p.PersonType = 'SP'
